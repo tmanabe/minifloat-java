@@ -42,7 +42,6 @@ public class Collector {
 
     Set<Integer> top() {
         Set<Integer> results = new HashSet<>();
-        Element element;
         while(priorityQueue.peek() != null) {
             results.add(priorityQueue.poll().id);
         }
