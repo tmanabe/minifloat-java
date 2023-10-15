@@ -1,3 +1,6 @@
+import java.util.List;
+import java.util.Set;
+
 class INT8Dataset {
     static float dotProduct(float[] a, byte[] b) {
         assert a.length == b.length;
@@ -27,5 +30,20 @@ class INT8Dataset {
             }
         }
         return result;
+    }
+
+    float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
+        float total = 0f;
+        Collector collector = new Collector(capacity);
+        for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {
+            Set<Integer> expect = expects.get(i);
+            for (int id = 0; id < byteMatrix.length; ++id) {
+                collector.collect(dotProduct(fp32Dataset.floatMatrix[i], byteMatrix[id]), id);
+            }
+            Set<Integer> actual = collector.top();
+            actual.retainAll(expect);
+            total += 1f * actual.size() / expect.size();
+        }
+        return total / fp32Dataset.floatMatrix.length;
     }
 }

@@ -1,5 +1,7 @@
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class FP32Dataset {
     static float dotProduct(float[] a, float[] b) {
@@ -32,5 +34,17 @@ public class FP32Dataset {
             }
         }
         return result;
+    }
+
+    List<Set<Integer>> top(int capacity, FP32Dataset fp32Dataset) {
+        List<Set<Integer>> results = new ArrayList<>();
+        Collector collector = new Collector(capacity);
+        for (float[] a : fp32Dataset.floatMatrix) {
+            for (int id = 0; id < floatMatrix.length; ++id) {
+                collector.collect(dotProduct(a, floatMatrix[id]), id);
+            }
+            results.add(collector.top());
+        }
+        return results;
     }
 }

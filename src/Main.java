@@ -1,6 +1,8 @@
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 public class Main {
     static class Stopwatch implements Closeable {
@@ -25,12 +27,21 @@ public class Main {
         Safetensors safetensors = Safetensors.safe_open(file);
         FP32Dataset queries = prepare(safetensors, "queries");
         FP32Dataset fp32_titles = prepare(safetensors, "product_titles");
+        System.out.println("Micro Benchmark:");
         try(Stopwatch ignore = new Stopwatch()) {
             System.out.println(fp32_titles.matMul(queries));
         }
         INT8Dataset int8_titles = new INT8Dataset(fp32_titles);
         try(Stopwatch ignore = new Stopwatch()) {
             System.out.println(int8_titles.matMul(queries));
+        }
+        System.out.println("Practical Benchmark:");
+        List<Set<Integer>> expects;
+        try(Stopwatch ignore = new Stopwatch()) {
+            expects = fp32_titles.top(20, queries);
+        }
+        try(Stopwatch ignore = new Stopwatch()) {
+            System.out.println(int8_titles.top(20, queries, expects));
         }
     }
 }
