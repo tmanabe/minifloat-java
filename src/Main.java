@@ -1,77 +1,36 @@
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.nio.FloatBuffer;
-import java.util.List;
 
 public class Main {
-    public static float dotProduct(float[] a, float[] b) {
-        assert a.length == b.length;
-        float result = 0f;
-        for (int i = 0; i < a.length; ++i) {
-            result += a[i] * b[i];
+    static class Stopwatch implements Closeable {
+        Stopwatch() {
+            begin = System.currentTimeMillis();
         }
-        return result;
+
+        long begin;
+
+        @Override
+        public void close() {
+            System.out.println(System.currentTimeMillis() - begin);
+        }
     }
 
-    public static float dotProduct(float[] a, byte[] b) {
-        assert a.length == b.length;
-        float result = 0f;
-        for (int i = 0; i < a.length; ++i) {
-            result += a[i] * b[i];
-        }
-        return result;
+    static FP32Dataset prepare(Safetensors safetensors, String tensorName) {
+        return new FP32Dataset(safetensors.getShape(tensorName), 1000, safetensors.getFP32(tensorName));
     }
 
     public static void main(String[] args) throws IOException {
         File file = new File("/Users/owner/working/tmanabe/arbitrary-embeddings/jp_test.safetensors");
         Safetensors safetensors = Safetensors.safe_open(file);
-
-        List<Integer> queriesShape = safetensors.getShape("queries");
-        assert 2 == queriesShape.size();
-        float[][] rawQueries = new float[queriesShape.get(0)][queriesShape.get(1)];
-        {
-            FloatBuffer queries = safetensors.getFP32("queries");
-            for (int i = 0; i < queriesShape.get(0); ++i) {
-                queries.get(rawQueries[i]);
-            }
+        FP32Dataset queries = prepare(safetensors, "queries");
+        FP32Dataset fp32_titles = prepare(safetensors, "product_titles");
+        try(Stopwatch ignore = new Stopwatch()) {
+            System.out.println(fp32_titles.matMul(queries));
         }
-        List<Integer> productTitlesShape = safetensors.getShape("product_titles");
-        assert 2 == productTitlesShape.size();
-        float[][] rawProductTitles = new float[productTitlesShape.get(0)][productTitlesShape.get(1)];
-        {
-            FloatBuffer productTitles = safetensors.getFP32("product_titles");
-            for (int i = 0; i < productTitlesShape.get(0); ++i) {
-                productTitles.get(rawProductTitles[i]);
-            }
-        }
-        {
-            long begin = System.currentTimeMillis();
-            for (float[] rawQuery : rawQueries) {
-                for (float[] rawProductTitle : rawProductTitles) {
-                    dotProduct(rawQuery, rawProductTitle);
-                }
-            }
-            long end = System.currentTimeMillis();
-            System.out.println(end - begin);
-        }
-
-        byte[][] int8ProductTitles = new byte[productTitlesShape.get(0)][productTitlesShape.get(1)];
-        {
-            for (int i = 0; i < productTitlesShape.get(0); ++i) {
-                for (int j = 0; j < productTitlesShape.get(1); ++j) {
-                    int8ProductTitles[i][j] = INT8.encode(rawProductTitles[i][j]);
-                }
-            }
-        }
-        {
-            long begin = System.currentTimeMillis();
-            for (float[] rawQuery : rawQueries) {
-                for (byte[] int8ProductTitle : int8ProductTitles) {
-                    dotProduct(rawQuery, int8ProductTitle);
-                }
-            }
-            long end = System.currentTimeMillis();
-            System.out.println(end - begin);
+        INT8Dataset int8_titles = new INT8Dataset(fp32_titles);
+        try(Stopwatch ignore = new Stopwatch()) {
+            System.out.println(int8_titles.matMul(queries));
         }
     }
 }

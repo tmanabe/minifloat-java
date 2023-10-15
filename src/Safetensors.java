@@ -12,22 +12,21 @@ import java.nio.FloatBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Safetensors {
-    public static class TensorMetadata {
-        private String dtype;
-        private List<Integer> shape;
-        private AbstractMap.SimpleEntry<Integer, Integer> dataOffsets;
+    static class TensorMetadata {
+        String dtype;
+        List<Integer> shape;
+        AbstractMap.SimpleEntry<Integer, Integer> dataOffsets;
     }
 
-    private Map<String, TensorMetadata> header;
-    private ByteBuffer byteBuffer;
+    Map<String, TensorMetadata> header;
+    ByteBuffer byteBuffer;
 
-    public static Safetensors safe_open(File file) throws IOException {
+    static Safetensors safe_open(File file) throws IOException {
         DataInputStream dataInputStream;
         {
             FileInputStream fileInputStream = new FileInputStream(file);
@@ -45,7 +44,7 @@ public class Safetensors {
 
         String stringHeader;
         {
-            assert headerSize < Integer.MAX_VALUE;
+            assert headerSize <= Integer.MAX_VALUE;
             byte[] bytesHeader = new byte[(int) headerSize];
             int read = dataInputStream.read(bytesHeader);
             assert headerSize == read;
@@ -104,13 +103,12 @@ public class Safetensors {
         return safetensors;
     }
 
-    public List<Integer> getShape(String tensorName) {
+    List<Integer> getShape(String tensorName) {
         assert header.containsKey(tensorName);
-        TensorMetadata tensorMetadata = header.get(tensorName);
-        return Collections.unmodifiableList(tensorMetadata.shape);
+        return header.get(tensorName).shape;
     }
 
-    public FloatBuffer getFP32(String tensorName) {
+    FloatBuffer getFP32(String tensorName) {
         assert header.containsKey(tensorName);
         TensorMetadata tensorMetadata = header.get(tensorName);
         assert tensorMetadata.dtype.equals("FP32");
