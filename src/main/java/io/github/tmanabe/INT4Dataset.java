@@ -1,10 +1,12 @@
+package io.github.tmanabe;
+
 import java.util.List;
 import java.util.Set;
 
-class INT4Dataset {
-    byte[][] byteMatrix;
+public class INT4Dataset {
+    private byte[][] byteMatrix;
 
-    INT4Dataset(FP32Dataset fp32Dataset) {
+    public INT4Dataset(FP32Dataset fp32Dataset) {
         assert 0 == fp32Dataset.shape.get(1) % 2;
         byteMatrix = new byte[fp32Dataset.floatMatrix.length][fp32Dataset.shape.get(1) / 2];
         for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {
@@ -12,7 +14,7 @@ class INT4Dataset {
         }
     }
 
-    float matMul(FP32Dataset fp32Dataset) {
+    public float matMul(FP32Dataset fp32Dataset) {
         float result = 0f;
         for (float[] floats : fp32Dataset.floatMatrix) {
             for (byte[] bytes : byteMatrix) {
@@ -22,7 +24,7 @@ class INT4Dataset {
         return result;
     }
 
-    float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
+    public float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
         float total = 0f;
         Collector collector = new Collector(capacity);
         for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {

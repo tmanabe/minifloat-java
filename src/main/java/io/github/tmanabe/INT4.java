@@ -1,5 +1,7 @@
-class INT4 {
-    static byte encode(float f) {
+package io.github.tmanabe;
+
+public class INT4 {
+    public static byte encode(float f) {
         int i = Math.round(f);
         if (i < -8) {
             return (byte) -8;  // 0b1000
@@ -10,11 +12,11 @@ class INT4 {
         return (byte) i;
     }
 
-    static float decode(byte b) {
+    public static float decode(byte b) {
         return b;
     }
 
-    static byte pack(byte a, byte b) {
+    public static byte pack(byte a, byte b) {
         int result = 0;
         if (a < 0) {
             result |= 1 << 7;
@@ -27,7 +29,7 @@ class INT4 {
         return (byte) result;
     }
 
-    static byte[] unpack(byte b) {
+    public static byte[] unpack(byte b) {
         int[] results = new int[2];
         results[0] = b >> 4;
         if (0 < (b & (1 << 3))) {
@@ -38,7 +40,7 @@ class INT4 {
         return new byte[]{(byte) results[0], (byte) results[1]};
     }
 
-    static byte[] batchEncode(float[] fs) {
+    public static byte[] batchEncode(float[] fs) {
         assert 0 == fs.length % 2;
         byte[] bs = new byte[fs.length / 2];
         for (int i = 0; i < bs.length; ++i) {
@@ -47,7 +49,7 @@ class INT4 {
         return bs;
     }
 
-    static float dotProduct(float[] fs, byte[] bs) {
+    public static float dotProduct(float[] fs, byte[] bs) {
         assert fs.length == bs.length * 2;
         float result = 0f;
         for (int i = 0; i < bs.length; ++i) {

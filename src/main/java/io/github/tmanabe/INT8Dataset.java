@@ -1,8 +1,10 @@
+package io.github.tmanabe;
+
 import java.util.List;
 import java.util.Set;
 
-class INT8Dataset {
-    static float dotProduct(float[] floats, byte[] bytes) {
+public class INT8Dataset {
+    private static float dotProduct(float[] floats, byte[] bytes) {
         assert floats.length == bytes.length;
         float result = 0f;
         for (int i = 0; i < floats.length; ++i) {
@@ -11,9 +13,9 @@ class INT8Dataset {
         return result;
     }
 
-    byte[][] byteMatrix;
+    private final byte[][] byteMatrix;
 
-    INT8Dataset(FP32Dataset fp32Dataset) {
+    public INT8Dataset(FP32Dataset fp32Dataset) {
         byteMatrix = new byte[fp32Dataset.floatMatrix.length][fp32Dataset.shape.get(1)];
         for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {
             for (int j = 0; j < fp32Dataset.shape.get(1); ++j) {
@@ -22,7 +24,7 @@ class INT8Dataset {
         }
     }
 
-    float matMul(FP32Dataset fp32Dataset) {
+    public float matMul(FP32Dataset fp32Dataset) {
         float result = 0f;
         for (float[] floats : fp32Dataset.floatMatrix) {
             for (byte[] bytes : byteMatrix) {
@@ -32,7 +34,7 @@ class INT8Dataset {
         return result;
     }
 
-    float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
+    public float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
         float total = 0f;
         Collector collector = new Collector(capacity);
         for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {

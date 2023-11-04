@@ -1,10 +1,12 @@
+package io.github.tmanabe;
+
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 public class FP32Dataset {
-    static float dotProduct(float[] a, float[] b) {
+    private static float dotProduct(float[] a, float[] b) {
         assert a.length == b.length;
         float result = 0f;
         for (int i = 0; i < a.length; ++i) {
@@ -16,7 +18,7 @@ public class FP32Dataset {
     List<Integer> shape;
     float[][] floatMatrix;
 
-    FP32Dataset(List<Integer> shape, int limit, FloatBuffer floatBuffer) {
+    public FP32Dataset(List<Integer> shape, int limit, FloatBuffer floatBuffer) {
         assert 2 == shape.size();
         assert limit <= shape.get(0);
         this.shape = shape;
@@ -26,7 +28,7 @@ public class FP32Dataset {
         }
     }
 
-    float matMul(FP32Dataset fp32Dataset) {
+    public float matMul(FP32Dataset fp32Dataset) {
         float result = 0f;
         for (float[] a : fp32Dataset.floatMatrix) {
             for (float[] b : floatMatrix) {
@@ -36,7 +38,7 @@ public class FP32Dataset {
         return result;
     }
 
-    List<Set<Integer>> top(int capacity, FP32Dataset fp32Dataset) {
+    public List<Set<Integer>> top(int capacity, FP32Dataset fp32Dataset) {
         List<Set<Integer>> results = new ArrayList<>();
         Collector collector = new Collector(capacity);
         for (float[] a : fp32Dataset.floatMatrix) {

@@ -1,13 +1,15 @@
+package io.github.tmanabe;
+
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
 public class Collector {
-    static class Element implements Comparable<Element> {
-        float priority;
-        int id;
+    private static class Element implements Comparable<Element> {
+        private float priority;
+        private int id;
 
-        Element(float priority, int id) {
+        private Element(float priority, int id) {
             this.priority = priority;
             this.id = id;
         }
@@ -18,16 +20,16 @@ public class Collector {
         }
     }
 
-    int capacity;
-    PriorityQueue<Element> priorityQueue;
+    private final int capacity;
+    private final PriorityQueue<Element> priorityQueue;
 
-    Collector(int capacity) {
+    public Collector(int capacity) {
         assert 0 < capacity;
         this.capacity = capacity;
         priorityQueue = new PriorityQueue<>(capacity);
     }
 
-    void collect(float priority, int id) {
+    public void collect(float priority, int id) {
         if (priorityQueue.size() < capacity) {
             priorityQueue.add(new Element(priority, id));
         } else {
@@ -40,7 +42,7 @@ public class Collector {
         }
     }
 
-    Set<Integer> top() {
+    public Set<Integer> top() {
         Set<Integer> results = new HashSet<>();
         while(priorityQueue.peek() != null) {
             results.add(priorityQueue.poll().id);

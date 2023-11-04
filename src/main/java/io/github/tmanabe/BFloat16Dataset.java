@@ -1,8 +1,10 @@
+package io.github.tmanabe;
+
 import java.util.List;
 import java.util.Set;
 
 public class BFloat16Dataset {
-    static float dotProduct(float[] floats, short[] shorts) {
+    private static float dotProduct(float[] floats, short[] shorts) {
         assert floats.length == shorts.length;
         float result = 0f;
         for (int i = 0; i < floats.length; ++i) {
@@ -11,9 +13,9 @@ public class BFloat16Dataset {
         return result;
     }
 
-    short[][] shortMatrix;
+    private final short[][] shortMatrix;
 
-    BFloat16Dataset(FP32Dataset fp32Dataset) {
+    public BFloat16Dataset(FP32Dataset fp32Dataset) {
         shortMatrix = new short[fp32Dataset.floatMatrix.length][fp32Dataset.shape.get(1)];
         for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {
             for (int j = 0; j < fp32Dataset.shape.get(1); ++j) {
@@ -22,7 +24,7 @@ public class BFloat16Dataset {
         }
     }
 
-    float matMul(FP32Dataset fp32Dataset) {
+    public float matMul(FP32Dataset fp32Dataset) {
         float result = 0f;
         for (float[] floats : fp32Dataset.floatMatrix) {
             for (short[] shorts : shortMatrix) {
@@ -32,7 +34,7 @@ public class BFloat16Dataset {
         return result;
     }
 
-    float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
+    public float top(int capacity, FP32Dataset fp32Dataset, List<Set<Integer>> expects) {
         float total = 0f;
         Collector collector = new Collector(capacity);
         for (int i = 0; i < fp32Dataset.floatMatrix.length; ++i) {
